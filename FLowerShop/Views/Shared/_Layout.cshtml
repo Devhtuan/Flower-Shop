@@ -1,0 +1,265 @@
+﻿@{
+    var cartFlowerModel = new FlowerShop.Models.CartFlowerModel();
+
+    if (Session["UserId"] != null && ViewBag.ShoppingCarts != null)
+    {
+        cartFlowerModel.ShoppingCarts = ViewBag.ShoppingCarts;
+    }
+    else
+    {
+        cartFlowerModel.ShoppingCarts = Session["ShoppingCart"] as List<FlowerShop.Context.SHOPPINGCART>;
+    }
+
+    int cartCount = cartFlowerModel.ShoppingCarts?.Count ?? 0;
+}
+
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/jpg" href="~/Content/assets/img/logo-icon.png">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/assets/css/main.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="header" class="bg-milk">
+        <nav id="top" class="p-2">
+            <div class="container">
+                <div class="nav float-start">
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            HOTLINE: <a href="tel:1900633045">1900 797 797 </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="nav float-end">
+                    <ul class="list-inline">
+                        <li class="list-inline-item">
+                            <div class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span class="d-none d-md-inline">Tài khoản</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @if (Session["UserId"] != null)
+                                    {
+                                        <li><a class="dropdown-item link-select" href="@Url.Action("Account", "Account")" data-url="@Url.Action("Account", "Account")">Tài khoản</a></li>
+                                        <li><a class="dropdown-item link-select" href="@Url.Action("OrderHistory", "Account")" data-url="@Url.Action("OrderHistory", "Account")">Lịch sử đơn hàng</a></li>
+                                        <li><a class="dropdown-item link-select" href="@Url.Action("Logout", "Account")" data-url="@Url.Action("Logout", "Account")">Đăng xuất</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li><a class="dropdown-item link-select" href="@Url.Action("Register", "Account")" data-url="@Url.Action("Register", "Account")">Đăng ký</a></li>
+                                        <li><a class="dropdown-item link-select" href="@Url.Action("Login", "Account")" data-url="@Url.Action("Login", "Account")">Đăng nhập</a></li>
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="link-select" href="@Url.Action("Index", "ShoppingCart")" title="Giỏ hàng" data-url="@Url.Action("Index", "ShoppingCart")">
+                                <i class="fa-solid fa-bag-shopping"></i>
+                                <span class="d-none d-md-inline">Giỏ hàng</span>
+                            </a>
+                        </li>
+                        <li class="list-inline-item">
+                            <a class="link-select" href="@Url.Action("Index", "Checkout")" title="Thanh toán" data-url="@Url.Action("Index", "Checkout")">
+                                <i class="fa-solid fa-share"></i>
+                                <span class="d-none d-md-inline">Thanh toán</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <nav id="main-header" class="navbar d-block navbar-expand-lg bg-body-tertiary p-0">
+            <div class="container">
+                <a class="navbar-brand link-select" href="@Url.Action("Index", "Home")" data-url="@Url.Action("Index", "Home")">
+                    <img src="~/Content/assets/img/logo-bloom.png" alt="Logo" style="width: 120px">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+                        aria-controls="navbarMenu" aria-expanded="false">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarMenu">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link link-select" href="@Url.Action("Index", "Home")" data-url="@Url.Action("Index", "Home")">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-select" href="@Url.Action("Info", "Home")" data-url="@Url.Action("Info", "Home")">Giới thiệu</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                Sản phẩm
+                            </a>
+                            <ul class="dropdown-menu bg-milk">
+                                @foreach (var item in ViewBag.lstFLowerTypes)
+                                {
+                                    <li><a class="dropdown-item link-select" href="@Url.Action("Index", "FlowerTypes", new { flowerTypeId = item.FLOWERTYPE_ID })" data-url="@Url.Action("Index", "FlowerTypes", new { flowerTypeId = item.FLOWERTYPE_ID })">@item.FLOWERTYPE_NAME</a></li>
+                                }
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-select" href="@Url.Action("News", "Home")" data-url="@Url.Action("News", "Home")">Tin tức</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link link-select" href="@Url.Action("Contact", "Home")" data-url="@Url.Action("Contact", "Home")">Liên hệ</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex mb-3 mb-md-0">
+                        @using (Html.BeginForm("Search", "FLowers", FormMethod.Get, new { @class = "d-flex" }))
+                        {
+                            <input class="border border-3 border-top-0 border-start-0 border-end-0 bg-milk" type="search" name="searchQuery"
+                                   placeholder="Tìm kiếm sản phẩm..." aria-label="Search" style=" outline: none;">
+                            <button class="bg-pink text-white rounded-1 p-2 d-flex align-items-center border-0">Tìm kiếm</button>
+                        }
+                        <a class="p-2 position-relative shopping-cart link-select ms-3 d-block d-md-none" data-url="@Url.Action("Index", "ShoppingCart")">
+                            <i class="fa-solid fa-cart-shopping fs-4 text-pink"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+                                @cartCount
+                            </span>
+                        </a>
+                        <button type="button" class="btn shadow-none shopping-cart position-relative bg-milk d-none d-md-block">
+                            <div class="dropdown">
+                                <a class="dropdown-header" role="button" @(Request.Path == Url.Action("Index", "Checkout") ? "href=" + Url.Action("Index", "ShoppingCart") : "data-bs-toggle=dropdown") aria-expanded="false">
+                                    <i class="fa-solid fa-cart-shopping fs-4 text-pink"></i>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+                                        @cartCount
+                                    </span>
+                                </a>
+                                <div id="table-list-cart-flower">
+                                    @Html.Partial("_CartFLower", cartFlowerModel)
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="content" style="min-height: 600px">
+        @RenderBody()
+    </div>
+
+    <div id="footer">
+        <footer class="text-center text-lg-start text-white" style="background-color: #252525">
+            <section class="pt-5">
+                <div class="container text-center text-md-start">
+                    <div class="row ">
+                        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                            <h6 class="text-uppercase fw-bold">Bloom Flower</h6>
+                            <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                                style="width: 60px; background-color: #7c4dff; height: 2px" />
+                            <p>
+                                Shop hoa tươi chất lượng chúng tôi mong muốn mang đến nhiều mẫu mã đa dạng chất lượng hoa tốt đến khách
+                                hàng
+                            </p>
+                        </div>
+                        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                            <h6 class="text-uppercase fw-bold">Sản phẩm</h6>
+                            <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                                style="width: 60px; background-color: #7c4dff; height: 2px" />
+                            @{
+                                var flowerTypes = ViewBag.lstFLowerTypes as List<FlowerShop.Context.FLOWERTYPE>;
+                                if (flowerTypes != null)
+                                {
+                                    var top5FlowerTypes = flowerTypes.Take(5);
+                                    foreach (var item in top5FlowerTypes)
+                                    {
+                                        <p>
+                                            <a href="@Url.Action("Index", "FlowerTypes", new { flowerTypeId = item.FLOWERTYPE_ID })" class="text-white link-select">@item.FLOWERTYPE_NAME</a>
+                                        </p>
+                                    }
+                                }
+                            }
+                        </div>
+                        <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+                            <h6 class="text-uppercase fw-bold">Giới thiệu</h6>
+                            <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                                style="width: 60px; background-color: #7c4dff; height: 2px" />
+                            <p>
+                                <a href="@Url.Action("Info", "Home")" data-url="@Url.Action("Info", "Home")" class="text-white link-select">Giới thiệu</a>
+                            </p>
+                            <p>
+                                <a href="@Url.Action("News", "Home")" data-url="@Url.Action("News", "Home")" class="text-white link-select">Tin tức</a>
+                            </p>
+                            <p>
+                                <a href="@Url.Action("Contact", "Home")" data-url="@Url.Action("Contact", "Home")" class="text-white link-select">Liên hệ</a>
+                            </p>
+                        </div>
+                        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                            <h6 class="text-uppercase fw-bold">Thông tin liên hệ</h6>
+                            <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                                style="width: 60px; background-color: #7c4dff; height: 2px" />
+                            <p><i class="fas fa-home mr-3"></i> District 9, HoChiMinh City, VietNam</p>
+                            <p><i class="fas fa-envelope mr-3"></i> BloomFlower@gmail.com</p>
+                            <p><i class="fas fa-phone mr-3"></i> + 84 797 797 979</p>
+                            <section class="text-center mb-5">
+                                <a href="https://facebook.com/leex.dev" class="text-white me-4">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="https://www.instagram.com/leex.dev" class="text-white me-4">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://www.linkedin.com/in/lee-nguyen-092194259/" class="text-white me-4">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="https://github.com/leexdev" class="text-white ">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </footer>
+    </div>
+
+    <div class="position-fixed bottom-0 end-0 m-2 m-md-4" style="z-index: 1;">
+        <div id="contact-info">
+            <div>
+                <a href="https://m.me/leex.dev">
+                    <div class="p-2 bg-body contact-info-item border rounded-circle ">
+                        <img src="~/Content/assets/img/ms.png" alt="">
+                    </div>
+                </a>
+            </div>
+            <div class="my-3">
+                <a href="https://zalo.me/0337378867">
+                    <div class="p-2 bg-body contact-info-item border rounded-circle ">
+                        <img src="~/Content/assets/img/zalo.png" alt="">
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="tel:0337378867">
+                    <div class="p-2 bg-body contact-info-item border rounded-circle ">
+                        <img src="~/Content/assets/img/phone.png" alt="">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="margin-top: 90px; z-index: 1">
+        <div id="toastContainer" class="align-items-center">
+        </div>
+    </div>
+
+    <script src="~/Content/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Content/assets/js/main.js"></script>
+</body>
+
+</html>
+
+

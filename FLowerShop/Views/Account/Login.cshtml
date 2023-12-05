@@ -1,0 +1,94 @@
+﻿@model FlowerShop.Context.USER
+
+@{
+    ViewBag.Title = "Đăng nhập";
+}
+
+<div class="container">
+    <div id="showAlert">
+
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-9">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <h5 class="fw-bold">Khách hàng mới</h5>
+                        <span class="fw-bold my-1">Đăng ký tài khoản</span>
+                        <p>Bằng cách tạo tài khoản, bạn sẽ có thể mua sắm nhanh hơn, cập nhật trạng thái đơn hàng và theo dõi các đơn hàng bạn đã thực hiện trước đó.</p>
+                        <a href="@Url.Action("Register", "Account")" class="btn btn-danger">Tiếp tục</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <h5 class="fw-bold text-center">Đăng nhập</h5>
+                        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+                        {
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.USER_EMAIL, new { @class = "fw-bold text-secondary form-label" })
+                                @Html.TextBoxFor(m => m.USER_EMAIL, new { @class = "form-control", required = "required", type = "email" })
+                                @Html.ValidationMessageFor(model => model.USER_EMAIL, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="mb-2">
+                                @Html.LabelFor(model => model.USER_PASSWORD, new { @class = "fw-bold text-secondary form-label" })
+                                @Html.PasswordFor(m => m.USER_PASSWORD, new { @class = "form-control", required = "required" })
+                                @Html.ValidationMessageFor(model => model.USER_PASSWORD, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="form-check p-0 my-1">
+                                <a href="@Url.Action("ForgotPassword", "Account")" class="text-pink fs-7 fw-bold">Quên mật khẩu?</a>
+                            </div>
+                            <button type="submit" class="btn btn-danger text-white w-100">Đăng nhập</button>
+                            <div class="row my-3">
+                                <div class="col-6">
+                                    <a href="@ViewBag.UrlFacebook"
+                                       class="btn btn-outline-success text-body fs-7 fw-bold d-flex justify-content-center align-items-center w-100">
+                                        <i class="fa-brands fa-facebook text-primary me-2 fs-5"></i>Facebook
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="#"
+                                            class="btn btn-outline-success text-body fs-7 fw-bold d-flex justify-content-center align-items-center w-100">
+                                        <i class="fa-brands fa-google text-danger me-2 fs-5"></i>Google
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @Html.Partial("_MenuAccount")
+    </div>
+</div>
+
+@if (@ViewBag.ShowAlert == 0)
+{
+    <script>
+        document.getElementById('showAlert').innerHTML = `<div class="alert alert-success alert-dismissible">
+                        <i class="fa-solid fa-circle-check"></i> Một email thay đổi mật khẩu đã được gửi đến bạn, vui lòng kiểm tra email và làm theo hướng dẫn.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>`;
+    </script>
+}
+
+@if (@ViewBag.ShowAlert == 1)
+{
+    <script>
+        document.getElementById('showAlert').innerHTML = `<div class="alert alert-success alert-dismissible">
+                        <i class="fa-solid fa-circle-check"></i>Thay đổi mật khẩu thành công.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>`;
+    </script>
+}
+
+@if (@ViewBag.ShowAlert == 2)
+{
+    <script>
+        document.getElementById('showAlert').innerHTML = `<div class="alert alert-success alert-dismissible">
+                        <i class="fa-solid fa-circle-check"></i>Bạn đã đăng xuất khỏi tài khoản thành công.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>`;
+    </script>
+}
+

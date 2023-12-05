@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Giỏ hàng";
+}
+
+<div id="shopping-cart-flower">
+    @Html.Partial("_ShoppingCartFLower")
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById('shopping-cart-flower').addEventListener('change', (event) => {
+            const target = event.target;
+            if (target.classList.contains('quantity-flower')) {
+                var quantity = target.value;
+                var shoppingCartId = target.getAttribute("data-shoppingCartId");
+                var flowerId = target.getAttribute("data-flower-id");
+
+                fetch('/ShoppingCart/UpdateShoppingCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantity: quantity, shoppingCartId: shoppingCartId })
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        var totalPriceElements = document.querySelectorAll('.subtotal-price');
+                        totalPriceElements.forEach(e => {
+                            var dataFlowerId = e.getAttribute('data-flower-id');
+                            if (dataFlowerId === flowerId) {
+                                e.textContent = formatPrice(result.TotalPrice);
+                            }
+                        });
+
+                        var quantityElements = document.querySelectorAll('.quantity');
+                        quantityElements.forEach(e => {
+                            var dataFlowerId = e.getAttribute('data-flower-id');
+                            if (dataFlowerId === flowerId) {
+                                e.textContent = quantity;
+                            }
+                        });
+
+                        var cartcountElement = document.querySelectorAll('.cart-count');
+                        cartcountElement.forEach(e => {
+                            e.textContent = result.CartCount;
+                        });
+
+                        var totalPriceGrandElement = document.querySelectorAll('.total-price-grand');
+                        totalPriceGrandElement.forEach(e => {
+                            e.textContent = formatPrice(result.TotalPriceGrand);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                    });
+            }
+        });
+    });
+
+
+    function formatPrice(price) {
+        return price.toLocaleString() + "VNĐ";
+    }
+</script>

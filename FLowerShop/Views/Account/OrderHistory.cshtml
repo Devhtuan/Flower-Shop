@@ -1,0 +1,108 @@
+﻿@model PagedList.IPagedList<FlowerShop.Context.ORDER>
+
+@{
+    ViewBag.Title = "Lịch sử đơn hàng";
+}
+
+<div class="container">
+    <div class="row mt-3">
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="col-md-9">
+                <h5 class="fw-bold">Lịch sử đơn hàng</h5>
+                <hr class="my-2">
+                <div class="overflow-auto">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead>
+                            <tr>
+                                <td>Khách hàng</td>
+                                <td>Số lượng</td>
+                                <td>Trạng thái</td>
+                                <td>Tổng cộng</td>
+                                <td>Ngày thêm</td>
+                                <td></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var item in Model.OrderByDescending(o => o.ORDER_DATE))
+                            {
+                                <tr>
+                                    <td>@item.SENDER_NAME</td>
+                                    <td>@item.ORDERDETAILS.Sum(o => o.QUANTITY)</td>
+                                    <td>
+                                        @{
+                                            var latestOrderHistory = item.ORDERHISTORies.OrderByDescending(oh => oh.CHANGE_DATE).FirstOrDefault();
+                                            if (latestOrderHistory != null)
+                                            {
+                                                <span>@latestOrderHistory.STATUS</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@item.TOTAL_AMOUNT.Value.ToString("N0")VNĐ</td>
+                                    <td>@item.ORDER_DATE.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <a class="p-2 bg-pink rounded-2" href="@Url.Action("OrderDetail", "Account", new {orderId = item.ORDER_ID})" title="Chi tiết đơn hàng">
+                                            <i class="fa-solid fa-circle-info text-white"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav class="d-flex justify-content-center">
+                    <ul class="pagination">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Search", new { page = Model.PageNumber - 1, searchQuery = ViewBag.SearchQuery, flowerTypeId = ViewBag.SelectedFlowerTypeId, filterValue = ViewBag.FilterValue })" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&laquo;</span>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= Model.PageCount; i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("OrderHistory", "Account", new { page = i })">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("OrderHistory", "Account", new { page = Model.PageNumber + 1})" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="page-item disabled">
+                                <span class="page-link" aria-hidden="true">&raquo;</span>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+                <div class="button-select my-3">
+                    <a class="text-white bg-pink px-3 py-2 rounded-3 float-end my-3" href="@Url.Action("Account", "Account")">Tiếp tục</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-9">
+                <p>Bạn chưa thực hiện bất kỳ đơn đặt hàng nào trước đó!</p>
+            </div>
+        }
+
+        @Html.Partial("_MenuAccount")
+    </div>
+</div>

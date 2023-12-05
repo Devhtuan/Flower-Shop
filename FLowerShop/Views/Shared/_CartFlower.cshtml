@@ -1,0 +1,133 @@
+﻿@model FlowerShop.Models.CartFlowerModel
+
+@{
+    int totalPrice = 0;
+}
+<ul class="dropdown-menu dropdown-menu-end p-0">
+    <table class="table mb-0 table-cart-flower" style="min-width: 500px;">
+        @if (Model.ShoppingCarts != null && Model.ShoppingCarts.Count > 0)
+        {
+            <tbody>
+                @foreach (var item in Model.ShoppingCarts)
+                {
+                    <tr>
+                        <td class="text-center">
+                            <a href="@Url.Action("Detail", "Flowers", new {flowerId = item.FLOWER_ID})">
+                                <img class="img-thumbnail img-cart-flower"
+                                     src="~/Content/assets/img/product/@item.FLOWER.FLOWER_IMAGE" alt="@item.FLOWER.FLOWER_IMAGE">
+                            </a>
+                        </td>
+                        <td class="align-middle text-center">
+                            <a href="@Url.Action("Detail", "Flowers", new {flowerId = item.FLOWER_ID})">
+                                @item.FLOWER.FLOWER_NAME
+                            </a>
+                        </td>
+                        <td class="text-center align-middle quantity" data-flower-id="@item.FLOWER_ID">
+                            @item.QUANTITY
+                        </td>
+                        <td class="text-center align-middle subtotal-price" data-flower-id="@item.FLOWER_ID">
+                            @item.SUBTOTAL.Value.ToString("N0")VNĐ
+                        </td>
+                        <td class="text-start align-middle">
+                            <button class="btn bg-pink shadow-none btn-delete-product"
+                                    data-shoppingCartId="@item.CART_ID">
+                                <i class="fa-solid fa-x text-white"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    totalPrice += (int)@item.SUBTOTAL.Value;
+                }
+                <tr>
+                    <td class="fw-bold text-end" colspan="3">
+                        Tổng cộng
+                    </td>
+                    <td class="text-center total-price-grand">
+                        @totalPrice.ToString("N0")VNĐ
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="text-end" colspan="5">
+                        <a href="@Url.Action("Index", "ShoppingCart")" title="Giỏ hàng" class="text-pink me-3 link-select" data-url="@Url.Action("Index", "ShoppingCart")">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                            <span class="d-none d-md-inline">Giỏ hàng</span>
+                        </a>
+                        <a href="@Url.Action("Index", "Checkout")" title="Thanh toán" class="text-pink me-4">
+                            <i class="fa-solid fa-share"></i>
+                            <span class="d-none d-md-inline">Thanh toán</span>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        }
+        else
+        {
+            <h6 class="text-center py-4">Giỏ hàng của bạn đang trống</h6>
+        }
+    </table>
+</ul>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('table-list-cart-flower').addEventListener('click', (event) => {
+            if (event.target.classList.contains('btn-delete-product') || event.target.parentElement.classList.contains('btn-delete-product')) {
+                const button = event.target.classList.contains('btn-delete-product') ? event.target : event.target.parentElement;
+                const shoppingCartId = button.getAttribute('data-shoppingCartId');
+
+                fetch('/ShoppingCart/DeleteFlower', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ shoppingCartId }),
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        const shoppingCartFlower = document.getElementById('shopping-cart-flower');
+                        if (window.location.pathname.startsWith('/ShoppingCart')) {
+                            shoppingCartFlower.innerHTML = result.ShoppingCartFlower;
+                        }
+
+                        const cartFlower = document.getElementById('table-list-cart-flower');
+                        cartFlower.innerHTML = result.CartFlower;
+
+                        var dropdownHeaders = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+                        dropdownHeaders.forEach(header => {
+                            new bootstrap.Dropdown(header);
+                        });
+
+                        toastMessage("Xóa khỏi giỏ hàng thành công");
+
+                        document.querySelectorAll('.cart-count').forEach(e => {
+                            e.textContent = result.CartCount;
+                        });
+                    });
+
+            }
+        });
+    });
+
+    function toastMessage(message) {
+        const toastContainer = document.getElementById("toastContainer");
+        const newToast = document.createElement("div");
+        newToast.innerHTML = `<div class="d-flex bg-success mb-3 pe-5">
+                            <div class="toast-body">
+                              ${message}
+                            </div>
+                          </div>`;
+
+        if (toastContainer.firstChild) {
+            toastContainer.insertBefore(newToast, toastContainer.firstChild);
+        } else {
+            toastContainer.appendChild(newToast);
+        }
+    
+        const bootstrapToast = new bootstrap.Toast(newToast);
+        bootstrapToast.show();
+
+        newToast.addEventListener("hidden.bs.toast", function () {
+            toastContainer.removeChild(newToast);
+        });
+    }
+</script>
+

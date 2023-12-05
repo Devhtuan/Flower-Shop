@@ -1,0 +1,305 @@
+﻿@model FlowerShop.Models.OrderModel
+
+@{
+    ViewBag.Title = "Thanh toán";
+    int totalPrice = 30000;
+}
+
+<div class="container mt-3 mt-md-5">
+    @using (Html.BeginForm("Index", "Checkout", FormMethod.Post, new { id = "form-checkout" }))
+    {
+        <div class="row">
+            <div class="col-12 col-md-7">
+                <h5 class="m-0">Thông tin người gửi</h5>
+                <hr class="mt-2 mb-3" />
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Order.SENDER_NAME, new { @class = "fw-bold fs-6 form-label" })
+                            @Html.TextBoxFor(model => model.Order.SENDER_NAME, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Order.SENDER_NAME, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Order.SENDER_PHONE, new { @class = "fw-bold fs-6 form-label" })
+                            @Html.TextBoxFor(model => model.Order.SENDER_PHONE, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Order.SENDER_PHONE, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.SENDER_EMAIL, new { @class = "fw-bold fs-6 form-label" })
+                    @Html.TextBoxFor(model => model.Order.SENDER_EMAIL, new { @class = "form-control", required = "required", type = "email" })
+                    @Html.ValidationMessageFor(model => model.Order.SENDER_EMAIL, "", new { @class = "text-danger" })
+                </div>  
+                <h5 class="m-0 mt-4">Thông tin người nhận</h5>
+                <hr class="mt-2 mb-3" />
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Order.RECIPIENT_NAME, new { @class = "fw-bold fs-6 form-label" })
+                            @Html.TextBoxFor(model => model.Order.RECIPIENT_NAME, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Order.RECIPIENT_NAME, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Order.RECIPIENT_PHONE, new { @class = "fw-bold fs-6 form-label" })
+                            @Html.TextBoxFor(model => model.Order.RECIPIENT_PHONE, new { @class = "form-control", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Order.RECIPIENT_PHONE, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.Label("Tỉnh, thành phố", new { @class = "fw-bold fs-6 form-label" })
+                            <select class="form-select" required id="provinceSelect" name="ProvinceCode">
+                                <option selected disabled value="">--- Chọn tỉnh ---</option>
+                                @foreach (var item in ViewBag.ListProvinces)
+                                {
+                                    <option value="@item.code" data-provincecode="@item.code" @(item.name == Model.ProvinceName ? "selected" : "")>@item.name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.Label("Quận/ Huyện:", new { @class = "fw-bold fs-6 form-label" })
+                            <select class="form-select" required id="districtSelect" name="districtName">
+                                @if (ViewBag.ListDistricts != null)
+                                {
+                                    foreach (var item in ViewBag.ListDistricts)
+                                    {
+                                        <option value="@item.name" @(item.name == Model.DistrictName ? "selected" : "")>@item.name</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">--- Chọn tỉnh trước ---</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Order.RECIPIENT_ADDRESS, new { @class = "fw-bold fs-6 form-label" })
+                    @Html.TextBoxFor(model => model.Order.RECIPIENT_ADDRESS, new { @class = "form-control", required = "required" })
+                    @Html.ValidationMessageFor(model => model.Order.RECIPIENT_ADDRESS, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Order.MESSAGE_TO_RECIPIENT, new { @class = "fw-bold fs-6" })
+                    @Html.TextAreaFor(model => model.Order.MESSAGE_TO_RECIPIENT, new { @class = "form-control", rows = "4" })
+                </div>
+                <div class="mb-3">
+                    @Html.LabelFor(model => model.Order.MESSAGE_TO_SHOP, new { @class = "fw-bold fs-6" })
+                    @Html.TextAreaFor(model => model.Order.MESSAGE_TO_SHOP, new { @class = "form-control", rows = "4" })
+                </div>
+                @Html.LabelFor(model => model.Order.HIDE_SENDER_INFO, new { @class = "fw-bold fs-6" })
+                <div class="form-check mb-5">
+                    <input type="checkbox" class="form-check-input" id="check-hide-sender" name="Order.HIDE_SENDER_INFO" value="true">
+                    <input type="hidden" name="Order.HIDE_SENDER_INFO" value="false">
+                    @Html.Label("Giấu thông tin người gửi", new { @class = "form-check-label", @for = "check-hide-sender" })
+                </div>
+            </div>
+            <div class="col-12 col-md-5">
+                <div id="list-flower-checkout">
+                    <div class="overflow-auto">
+                        <h5 class="m-0">Chi tiết đơn hàng</h5>
+                        <hr class="mt-2 mb-3" />
+                        <table class="table table-bordered" id="table-flower-checkout">
+                            <thead>
+                                <tr class="text-center">
+                                    <th scope="col">Hình ảnh</th>
+                                    <th scope="col">Tên sản phẩm</th>
+                                    <th scope="col">Tổng cộng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.ShoppingCarts != null && Model.ShoppingCarts.Count > 0)
+                                {
+                                    foreach (var item in Model.ShoppingCarts)
+                                    {
+                                        <tr class="text-center align-middle">
+                                            <td>
+                                                <a href="@Url.Action("Detail", "Flowers", new {flowerId = item.FLOWER_ID})">
+                                                    <img class="img-thumbnail img-cart-flower" src="~/Content/assets/img/product/@item.FLOWER.FLOWER_IMAGE"
+                                                         alt="@item.FLOWER.FLOWER_IMAGE" />
+                                                </a>
+                                            </td>
+                                            <td>@item.QUANTITY x <a href="@Url.Action("Detail", "Flowers", new {flowerId = item.FLOWER_ID})">@item.FLOWER.FLOWER_NAME</a></td>
+                                            <td class="text-end">@item.SUBTOTAL.Value.ToString("N0")VNĐ</td>
+                                        </tr>
+                                        {
+                                            totalPrice += (int)item.SUBTOTAL;
+                                        }
+                                    }
+                                }
+                                <tr class="text-end">
+                                    <td colspan="2" class="fw-bold">Phí vận chuyển</td>
+                                    <td colspan="2">30,000VND</td>
+                                </tr>
+                                <tr class="text-end">
+                                    <td colspan="2" class="fw-bold">Tổng cộng</td>
+                                    <td colspan="2" id="total-price-checkout">@totalPrice.ToString("N0")VNĐ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <form id="form-coupon">
+                    <div class="row">
+                        <div class="col-12 col-md-3">
+                            <label for="input-coupon" class="col-form-label fw-bold">Mã giảm giá</label>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            @Html.TextBoxFor(m => m.DiscountCode.CODE, new {@id = "couponName", @class = "form-control", placeholder = "Mã giảm giá"} )
+                        </div>
+                        <div class="col-12 col-md-3 mt-3 mt-md-0 text-end">
+                            <button type="button" id="btn-add-coupon" class="btn bg-pink text-white btn-select-coupon">
+                                Áp dụng
+                            </button>
+                        </div>
+                        <label class="mt-2" id="coupon-alert"></label>
+                    </div>
+                </form>
+                <div class="form-check mt-4">
+                    <div class="d-flex">
+                        <input class="form-check-input my-auto" type="radio" value="true" name="Order.PAYMENT_METHOD" id="pay-wallet" />
+                        <label class="form-check-label" for="pay-wallet">
+                            <img class="img-fluid ms-1" src="~/Content/assets/img/cheque.png" alt="momo"
+                                 style="max-width: 48px; max-height: 48px" />
+                            Ví điện tử
+                            <img class="img-fluid" src="~/Content/assets/img/momo.png" alt="momo"
+                                 style="max-width: 48px; max-height: 48px" />
+                        </label>
+                    </div>
+                    <div class="d-flex">
+                        <input class="form-check-input my-auto" type="radio" value="false" name="Order.PAYMENT_METHOD" id="pay-cod" checked />
+                        <label class="form-check-label" for="pay-cod">
+                            <img class="img-fluid ms-1" src="~/Content/assets/img/cod.png" alt="momo"
+                                 style="max-width: 48px; max-height: 48px" />
+                            Thanh toán khi giao hàng
+                        </label>
+                    </div>
+                </div>
+                <hr>
+                <div class="col-auto float-end mb-3">
+                    <button type="submit" id="btn-checkout-form" class="btn mb-3 bg-pink text-white">
+                        Xác nhận đơn hàng
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    let formSubmitted = false;
+
+    let btnCheckout = document.getElementById('btn-checkout-form');
+
+    btnCheckout.addEventListener('click', function () {
+        formSubmitted = true;
+    });
+
+    window.addEventListener('beforeunload', function (event) {
+        if (!formSubmitted && !event.target.activeElement.isEqualNode(btnCheckout)) {
+            event.preventDefault();
+
+            if ('@Session["BuyFlower"]' !== null) {
+                fetch('/Checkout/ExitCheckout', {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+            }
+        }
+    });
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        let couponBtn = document.getElementById('btn-add-coupon');
+        couponBtn.addEventListener('click', () => {
+            let couponName = document.getElementById('couponName').value;
+            fetch('/Checkout/CheckCoupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ couponName}),
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.TotalPriceGrand != null) {
+                        document.getElementById('total-price-checkout').innerText = formatPrice(result.TotalPriceGrand);
+                    }
+                    let couponAlert = document.getElementById('coupon-alert');
+
+                    let table = document.getElementById('table-flower-checkout');
+                    let rowToRemove = document.getElementById('coupon-row');
+
+                    if (rowToRemove && rowToRemove.parentNode) {
+                        rowToRemove.parentNode.removeChild(rowToRemove);
+                    }
+
+                    if (result.CouponSuccess) {
+                        let hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'couponName';
+                        hiddenInput.value = result.CouponName;
+                        table.appendChild(hiddenInput);
+
+                        couponAlert.innerText = result.CouponSuccess;
+                        couponAlert.className = '';
+                        couponAlert.classList.add("mt-2", "text-success")
+
+                        var discountRow = table.insertRow(table.rows.length - 1);
+                        discountRow.id = 'coupon-row';
+                        discountRow.className = 'text-end';
+
+                        discountRow.insertCell(0).colSpan = 2;
+                        discountRow.cells[0].className = 'fw-bold';
+                        discountRow.cells[0].innerText = 'Mã giảm giá';
+
+                        discountRow.insertCell(1).colSpan = 2;
+                        discountRow.cells[1].innerText = '-' + formatPrice(result.CouponValue);
+
+                    }
+                    else {
+                        couponAlert.innerText = result.CouponError;
+                        couponAlert.className = '';
+                        couponAlert.classList.add("mt-2", "text-danger");
+                    }
+                })
+        });
+
+        let provinceSelect = document.getElementById('provinceSelect');
+        let districtSelect = document.getElementById('districtSelect');
+        provinceSelect.addEventListener('change', (event) => {
+            let selectedOption = event.target.options[event.target.selectedIndex];
+            let provinceCode = selectedOption.getAttribute('data-provincecode');
+
+            districtSelect.innerHTML = "";
+
+            fetch('/Checkout/GetDistricts?provinceCode=' + encodeURIComponent(provinceCode))
+                .then(response => response.json())
+                .then(result => {
+                    result.forEach(district => {
+                        let option = document.createElement('option');
+                        option.value = district.name;
+
+                        option.textContent = district.name;
+                        districtSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    });
+
+    function formatPrice(price) {
+        return price.toLocaleString() + "VNĐ";
+    }
+</script>
